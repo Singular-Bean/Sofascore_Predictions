@@ -32,4 +32,3 @@ Model accuracy: 0.08
 Correlation Coefficient: 0.8269565217391304
 
 ```
-![img.png](img.png)
