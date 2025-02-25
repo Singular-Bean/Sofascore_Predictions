@@ -568,6 +568,7 @@ def train_and_evaluate_model(json_file_path):
 
     return model, scaler  # Return model & scaler for future predictions
 
+
 def train_to_use_on_individual_match(json_file_path):
     # Load data from JSON file
     with open(json_file_path, "r") as f:
@@ -579,7 +580,6 @@ def train_to_use_on_individual_match(json_file_path):
     # Define target variable (Home_Points) and features (X)
     y = df["Home_Points"].astype(int)  # Ensure it's categorical
     X = df.drop(columns=["Home_Points", "Away_Points"])  # Features
-
 
     # Now scale the features
     scaler = MinMaxScaler()
@@ -602,8 +602,12 @@ def get_percent_from_match_odds(homewin, drawodds, awaywin):
     away = round((three / total), 2)
     return home, draw, away
 
+
 def solidify_name(name):
-    return fetch_and_parse_json(f"http://www.sofascore.com/api/v1/search/teams?q={name}&page=0")['results'][0]['entity']['name']
+    return \
+    fetch_and_parse_json(f"http://www.sofascore.com/api/v1/search/teams?q={name}&page=0")['results'][0]['entity'][
+        'name']
+
 
 option = input(
     "What would you like to do:\n1. Create training/testing Data\n2. Train a model to predict a game\n3. Predict a game\nPlease select 1, 2, or 3: ")
@@ -615,7 +619,8 @@ elif option == "2":
 elif option == "3":
     file_path = input("Enter the path to the JSON file containing the training data (e.g: data/training_data.json): ")
     model, scaler, samples = train_to_use_on_individual_match(file_path)
-    option2 = input("Would you like to:\n1. Run the model on a match that has already happened\n2. Run the model on a match that has not happened yet\nPlease select 1 or 2: ")
+    option2 = input(
+        "Would you like to:\n1. Run the model on a match that has already happened\n2. Run the model on a match that has not happened yet\nPlease select 1 or 2: ")
     if option2 == "1":
         hometeam = input("What is the name of the home team? ")
         awayteam = input("What is the name of the away team? ")
@@ -667,7 +672,8 @@ elif option == "3":
         class_order = model.classes_  # Get the order of classes used by the model
         prob_tuples = [tuple(probs[class_order == c][0] for c in [3, 1, 0]) for probs in result_odds]
         prob_tuples = [(float(home), float(draw), float(away)) for home, draw, away in prob_tuples]
-        print(f"Probability of {homefullname} winning: {prob_tuples[0][0]:.2f}\nProbability of a draw: {prob_tuples[0][1]:.2f}\nProbability of {awayfullname} winning: {prob_tuples[0][2]:.2f}")
+        print(
+            f"Probability of {homefullname} winning: {prob_tuples[0][0]:.2f}\nProbability of a draw: {prob_tuples[0][1]:.2f}\nProbability of {awayfullname} winning: {prob_tuples[0][2]:.2f}")
         print(f"Trained on {samples} samples.")
     elif option2 == "2":
         home_team = input("What is the name of the home team? ")
@@ -677,9 +683,14 @@ elif option == "3":
         home_win_face_odds = float(input("What are the decimal odds for the home team to win? "))
         draw_face_odds = float(input("What are the decimal odds for a draw? "))
         away_win_face_odds = float(input("What are the decimal odds for the away team to win? "))
-        home_win_odds, draw_odds, away_win_odds = get_percent_from_match_odds(home_win_face_odds, draw_face_odds, away_win_face_odds)
-        home_last_5 = input("Enter the goal difference for the home team's last 5 league games separated by commas, most recent first (e.g: 1,0,-1,2,-2): ").split(",")
-        away_last_5 = input("Enter the goal difference for the away team's last 5 league games separated by commas, most recent first (e.g: 1,0,-1,2,-2): ").split(",")
+        home_win_odds, draw_odds, away_win_odds = get_percent_from_match_odds(home_win_face_odds, draw_face_odds,
+                                                                              away_win_face_odds)
+        home_last_5 = input(
+            "Enter the goal difference for the home team's last 5 league games separated by commas, most recent first (e.g: 1,0,-1,2,-2): ").split(
+            ",")
+        away_last_5 = input(
+            "Enter the goal difference for the away team's last 5 league games separated by commas, most recent first (e.g: 1,0,-1,2,-2): ").split(
+            ",")
 
         home_team_list = (home_last_5[0], home_last_5[1], home_last_5[2], home_last_5[3],
                           home_last_5[4], home_league_pos, 1, draw_odds,
@@ -695,5 +706,6 @@ elif option == "3":
         class_order = model.classes_  # Get the order of classes used by the model
         prob_tuples = [tuple(probs[class_order == c][0] for c in [3, 1, 0]) for probs in result_odds]
         prob_tuples = [(float(home), float(draw), float(away)) for home, draw, away in prob_tuples]
-        print(f"Probability of {solidify_name(home_team)} winning: {prob_tuples[0][0]:.2f}\nProbability of a draw: {prob_tuples[0][1]:.2f}\nProbability of {solidify_name(away_team)} winning: {prob_tuples[0][2]:.2f}")
+        print(
+            f"Probability of {solidify_name(home_team)} winning: {prob_tuples[0][0]:.2f}\nProbability of a draw: {prob_tuples[0][1]:.2f}\nProbability of {solidify_name(away_team)} winning: {prob_tuples[0][2]:.2f}")
         print(f"Trained on {samples} samples.")

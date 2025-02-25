@@ -7,6 +7,7 @@ from scipy.optimize import linear_sum_assignment
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import accuracy_score
 
+
 def fetch_and_parse_json(url):
     response = requests.get(url)
     response.raise_for_status(
@@ -19,12 +20,16 @@ def fetch_and_parse_json(url):
 pd.set_option("display.max_columns", None)  # Show all columns
 pd.set_option("display.width", 1000)  # Adjust the width to prevent wrapping
 
+
 def create_training_or_testing_data():
     league = input("Enter the league you would like to use: ")
     year = str(input("Enter the year of the league you would like to use, (e.g. 19/20): "))
 
-    TOURNAMENT_ID=fetch_and_parse_json(f"http://www.sofascore.com/api/v1/search/unique-tournaments?q={league}&page=0")["results"][0]["entity"]["id"]
-    seasons = fetch_and_parse_json(f"http://www.sofascore.com/api/v1/unique-tournament/{TOURNAMENT_ID}/seasons")['seasons']
+    TOURNAMENT_ID = \
+    fetch_and_parse_json(f"http://www.sofascore.com/api/v1/search/unique-tournaments?q={league}&page=0")["results"][0][
+        "entity"]["id"]
+    seasons = fetch_and_parse_json(f"http://www.sofascore.com/api/v1/unique-tournament/{TOURNAMENT_ID}/seasons")[
+        'seasons']
     for x in seasons:
         if x["year"] == year:
             SEASON_ID = x["id"]
@@ -32,15 +37,16 @@ def create_training_or_testing_data():
         else:
             SEASON_ID = None
 
-
-    OTHER_TOURNAMENT_ID = fetch_and_parse_json(f"https://www.sofascore.com/api/v1/unique-tournament/{TOURNAMENT_ID}/season/{SEASON_ID}/events/round/1")["events"][0]["tournament"]["id"]
+    OTHER_TOURNAMENT_ID = fetch_and_parse_json(
+        f"https://www.sofascore.com/api/v1/unique-tournament/{TOURNAMENT_ID}/season/{SEASON_ID}/events/round/1")[
+        "events"][0]["tournament"]["id"]
 
     TARGET_FILENAME = input("Enter the file path you would like to save the data to: ")
 
-
     def teamidlist(tournamentid, seasonid):
         teamlist = []
-        url = "http://www.sofascore.com/api/v1/unique-tournament/" + str(tournamentid) + "/season/" + str(seasonid) + "/standings/total"
+        url = "http://www.sofascore.com/api/v1/unique-tournament/" + str(tournamentid) + "/season/" + str(
+            seasonid) + "/standings/total"
         data = fetch_and_parse_json(url)['standings'][0]['rows']
         for i in range(0, len(data)):
             teamlist.append(data[i]['team']['id'])
@@ -49,31 +55,32 @@ def create_training_or_testing_data():
     teamlistids = teamidlist(TOURNAMENT_ID, SEASON_ID)
     number_of_teams_in_comp = len(teamlistids)
 
-
     def match_result_list(seasonid, tournamentid):
         full_list = []
         not_completed_list = []
-        for p in range(0, number_of_teams_in_comp-1):
-            roundmatches = fetch_and_parse_json("http://www.sofascore.com/api/v1/unique-tournament/" + str(tournamentid) +
-                                                "/season/" + str(seasonid) + "/events/round/" + str(p+1))["events"]
+        for p in range(0, number_of_teams_in_comp - 1):
+            roundmatches = \
+            fetch_and_parse_json("http://www.sofascore.com/api/v1/unique-tournament/" + str(tournamentid) +
+                                 "/season/" + str(seasonid) + "/events/round/" + str(p + 1))["events"]
             for i in range(0, len(roundmatches)):
                 match = roundmatches[i]
                 if match["status"]["type"] == "finished":
-                    full_list.append((match["homeTeam"]["name"], match["homeScore"]["current"], match["awayTeam"]["name"],
-                                    match["awayScore"]["current"]))
-                elif match["status"]["type"] == "notstarted" and (match["homeTeam"]["name"], match["awayTeam"]["name"]) not in not_completed_list:
+                    full_list.append(
+                        (match["homeTeam"]["name"], match["homeScore"]["current"], match["awayTeam"]["name"],
+                         match["awayScore"]["current"]))
+                elif match["status"]["type"] == "notstarted" and (
+                match["homeTeam"]["name"], match["awayTeam"]["name"]) not in not_completed_list:
                     not_completed_list.append((match["homeTeam"]["name"], match["awayTeam"]["name"]))
         return full_list, not_completed_list
 
     team_and_final_position = []
     for i in range(0, len(teamlistids)):
-        link = fetch_and_parse_json(f"https://www.sofascore.com/api/v1/tournament/{OTHER_TOURNAMENT_ID}/season/{SEASON_ID}/standings/total")["standings"][0]["rows"][i]
+        link = fetch_and_parse_json(
+            f"https://www.sofascore.com/api/v1/tournament/{OTHER_TOURNAMENT_ID}/season/{SEASON_ID}/standings/total")[
+            "standings"][0]["rows"][i]
         team_and_final_position.append((link["team"]["name"], link["position"]))
 
     position_dict = dict(team_and_final_position)
-
-
-
 
     def create_league_table(results):
         # Dictionary to store team statistics
@@ -92,7 +99,7 @@ def create_training_or_testing_data():
             teams[home_team]["G/F"] += home_score
             teams[home_team]["G/A"] += away_score
             teams[home_team]["G/D"] = (
-                teams[home_team]["G/F"] - teams[home_team]["G/A"]
+                    teams[home_team]["G/F"] - teams[home_team]["G/A"]
             )
             if home_score > away_score:  # Home team wins
                 teams[home_team]["Pts"] += 3
@@ -104,7 +111,7 @@ def create_training_or_testing_data():
             teams[away_team]["G/F"] += away_score
             teams[away_team]["G/A"] += home_score
             teams[away_team]["G/D"] = (
-                teams[away_team]["G/F"] - teams[away_team]["G/A"]
+                    teams[away_team]["G/F"] - teams[away_team]["G/A"]
             )
             if away_score > home_score:  # Away team wins
                 teams[away_team]["Pts"] += 3
@@ -130,7 +137,6 @@ def create_training_or_testing_data():
         table["Points From First"] = first_place_points - table["Pts"]
         table["Points From Last"] = table["Pts"] - last_place_points
 
-
         return table
 
     results, not_completed = match_result_list(SEASON_ID, TOURNAMENT_ID)
@@ -139,7 +145,8 @@ def create_training_or_testing_data():
         scores = []
         print("The following matches have not been completed:")
         for home, away in not_completed:
-            score = input("Would you like to enter the scores for these matches?:\n"+f"{home} vs {away}"+": ").split("-")
+            score = input(
+                "Would you like to enter the scores for these matches?:\n" + f"{home} vs {away}" + ": ").split("-")
             scores.append((home, int(score[0]), away, int(score[1])))
         results += scores
 
@@ -163,8 +170,8 @@ def create_training_or_testing_data():
     with open(TARGET_FILENAME, "w") as file:
         json.dump(data, file, indent=4)
 
-def season_predict(training_data, testing_data):
 
+def season_predict(training_data, testing_data):
     def thin_down_list(input_list):
         result = []
         seen_teams = set()
@@ -178,7 +185,6 @@ def season_predict(training_data, testing_data):
                 seen_positions.add(position)
 
         return result
-
 
     # Load training data
     with open(training_data, "r") as file:
@@ -242,7 +248,6 @@ def season_predict(training_data, testing_data):
     # Correlation coefficient
     print("Correlation Coefficient:", np.corrcoef(y_test, resolved_positions)[0, 1])
 
-
     # Plot the results
     plt.scatter(resolved_positions, y_test)
     plt.xlabel("Predicted Position")
@@ -260,7 +265,8 @@ def season_predict(training_data, testing_data):
     plt.show()
 
 
-option = input("What would you like to do:\n1. Create training/testing Data\n2. Train a model to predict a season\nPlease select 1 or 2: ")
+option = input(
+    "What would you like to do:\n1. Create training/testing Data\n2. Train a model to predict a season\nPlease select 1 or 2: ")
 if option == "1":
     create_training_or_testing_data()
 elif option == "2":
