@@ -246,7 +246,7 @@ def season_predict(training_data, testing_data):
     print(f"Model accuracy: {accuracy:.2f}")
 
     # Correlation coefficient
-    print("Correlation Coefficient:", np.corrcoef(y_test, resolved_positions)[0, 1])
+    print("Correlation Coefficient:", round(np.corrcoef(y_test, resolved_positions)[0, 1], 5))
 
     # Plot the results
     plt.scatter(resolved_positions, y_test)

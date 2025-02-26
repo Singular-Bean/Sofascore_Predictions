@@ -664,17 +664,18 @@ elif option == "3":
                 matchid = entity["id"]
 
         home, away = match_data(matchid)
-        combined = [(home, away)]
-        df = create_match_dataframe(combined)
-        X = df.drop(columns=["Home_Points", "Away_Points"])
-        result_odds = model.predict_proba(scaler.transform(X))
-        # Ensure the order of classes matches expected output (home win, draw, away win)
-        class_order = model.classes_  # Get the order of classes used by the model
-        prob_tuples = [tuple(probs[class_order == c][0] for c in [3, 1, 0]) for probs in result_odds]
-        prob_tuples = [(float(home), float(draw), float(away)) for home, draw, away in prob_tuples]
-        print(
-            f"Probability of {homefullname} winning: {prob_tuples[0][0]:.2f}\nProbability of a draw: {prob_tuples[0][1]:.2f}\nProbability of {awayfullname} winning: {prob_tuples[0][2]:.2f}")
-        print(f"Trained on {samples} samples.")
+        if home is not None and away is not None:
+            combined = [(home, away)]
+            df = create_match_dataframe(combined)
+            X = df.drop(columns=["Home_Points", "Away_Points"])
+            result_odds = model.predict_proba(scaler.transform(X))
+            # Ensure the order of classes matches expected output (home win, draw, away win)
+            class_order = model.classes_  # Get the order of classes used by the model
+            prob_tuples = [tuple(probs[class_order == c][0] for c in [3, 1, 0]) for probs in result_odds]
+            prob_tuples = [(float(home), float(draw), float(away)) for home, draw, away in prob_tuples]
+            print(
+                f"Probability of {homefullname} winning: {prob_tuples[0][0]:.2f}\nProbability of a draw: {prob_tuples[0][1]:.2f}\nProbability of {awayfullname} winning: {prob_tuples[0][2]:.2f}")
+            print(f"Trained on {samples} samples.")
     elif option2 == "2":
         home_team = input("What is the name of the home team? ")
         away_team = input("What is the name of the away team? ")
