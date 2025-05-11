@@ -141,3 +141,87 @@ Probability of a draw: 0.71
 Probability of Manchester United winning: 0.03
 Trained on 1848 samples.
 ```
+
+# Rating Predict:
+
+Program to predict the sofascore rating of a player based on their in-game numbers.
+
+If the user chooses to create data, the program asks what tournament they would like to use. It then
+gives them the seasons that are valid for creating data with (the seasons since sofascore started
+giving ratings) and retrieves the data for the selected season. The stats that it collects depends
+on the season which is selected because sofascore gradually have been adding more and more.
+
+The stats provided in the 23/24 season are:
+
+- total passes
+- accurate passes
+- key passes
+- big chances created
+- big chances missed
+- total long balls
+- accurate long balls
+- total crosses
+- accurate crosses
+- aerial duels won
+- aerial duels lost
+- duels won
+- duels lost
+- total clearances
+- clearances off the line
+- total tackles
+- last man tackles
+- interceptions won
+- outfielder blocks
+- challenges lost
+- fouls
+- was fouled
+- total contests
+- won contests
+- minutes played
+- touches
+- possession lost
+- dispossessed
+- goals
+- assists
+- expected goals
+- expected assists
+- on target scoring attempts
+- blocked scoring attempts
+- shots off target
+- hit woodwork
+- penalties won
+- penalties conceded
+- penalty misses
+- errors leading to a shot
+- errors leading to a goal
+- own goals
+- total offsides
+- yellow cards
+- red cards
+
+The program then saves this data to a json file of the user's choosing.
+
+Obviously, this is a lot of statistics to collect, so in order to try and prevent overfitting, the
+dataset needed to be very large. Luckily, one premier league season is 380 games, with each game
+normally including around 30 players (11 + 11 + substitutes). This means that one season is around
+11400 players, which should be enough to avoid the problem.
+
+If the user chooses to train and evaluate a model, the program asks for the json file containing the
+training data. It then trains multiple models on this data. These models include RandomForest, KNN
+regression, Decision Tree, Gradient Boosting, XGBoost, SVR, and Linear Regression. It then runs 
+analysis on the models and outputs the R² and Mean Absolute Error of each model. Alongside this, for 
+each model it outputs a graph of the predicted ratings vs the actual ratings. This is to make it easier
+to visually see how well the model has done in predicting the ratings, and to see if any patterns
+emerge. It also outputs a graph of the distribution of the predicted ratings and a seperate graph at
+the end of the distribution of the actual ratings. This is to see if the distribution of the predicted
+ratings is similar to the distribution of the actual ratings.
+
+An example of both graphs is shown below:
+![img_2.png](img_2.png)
+![img_3.png](img_3.png)
+
+If the user chooses to predict the rating of a player, the program again asks for the json file 
+containing the training data. It then asks the user to manually input the data for the player they
+would like to predict the rating for. This is something which is quite tedious because there are so
+many statistics to input, but I may automate this in the future. It then uses the model to
+predict the rating of the player and outputs the result.
