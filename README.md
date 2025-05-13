@@ -196,8 +196,6 @@ The stats provided in the 23/24 season are:
 - errors leading to a goal
 - own goals
 - total offsides
-- yellow cards
-- red cards
 
 The program then saves this data to a json file of the user's choosing.
 
