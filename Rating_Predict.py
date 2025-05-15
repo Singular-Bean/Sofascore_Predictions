@@ -78,7 +78,7 @@ def create_json_file():
                 0][
                 'id']
             event_lineups = check_website_and_assign(
-                f"https://www.sofascore.com/api/v1/event/{random_event_id}/lineups")
+                f"http://www.sofascore.com/api/v1/event/{random_event_id}/lineups")
             if event_lineups is not None:
                 first_player = event_lineups['home']['players'][0]
                 if 'statistics' in first_player:
@@ -104,28 +104,103 @@ def create_json_file():
 
     def get_outfield_player_stats(match_id):
         item = []
+        yellows = []
+        yellowreds = []
+        reds = []
         event_lineups = check_website_and_assign(f"http://www.sofascore.com/api/v1/event/{match_id}/lineups")
-        home_lineups = event_lineups['home']['players']
-        away_lineups = event_lineups['away']['players']
-        for i in home_lineups:
-            if 'statistics' in i and i['position'] != 'G':
-                item.append(i['statistics'])
-        for i in away_lineups:
-            if 'statistics' in i and i['position'] != 'G':
-                item.append(i['statistics'])
-        return item
+        event_incidents = check_website_and_assign(f"http://www.sofascore.com/api/v1/event/{match_id}/incidents")
+        if event_lineups is not None and event_incidents is not None:
+            event_incidents = event_incidents['incidents']
+            for i in event_incidents:
+                if i['incidentType'] == 'card':
+                    if i['incidentClass'] == 'yellow':
+                        if 'player' in i:
+                            yellows.append(i['player']['name'])
+                    elif i['incidentClass'] == 'yellowRed':
+                        if 'player' in i:
+                            yellowreds.append(i['player']['name'])
+                    elif i['incidentClass'] == 'red':
+                        if 'player' in i:
+                            reds.append(i['player']['name'])
+            home_lineups = event_lineups['home']['players']
+            away_lineups = event_lineups['away']['players']
+            for i in home_lineups:
+                if 'statistics' in i and i['position'] != 'G':
+                    if i['player']['name'] in yellows and i['player']['name'] in yellowreds:
+                        i['statistics']['yellowReds'] = 1
+                        item.append(i['statistics'])
+                    elif i['player']['name'] in yellows:
+                        i['statistics']['yellows'] = 1
+                        item.append(i['statistics'])
+                    elif i['player']['name'] in reds:
+                        i['statistics']['reds'] = 1
+                        item.append(i['statistics'])
+                    else:
+                        item.append(i['statistics'])
+            for i in away_lineups:
+                if 'statistics' in i and i['position'] != 'G':
+                    if i['player']['name'] in yellows:
+                        i['statistics']['yellows'] = 1
+                        item.append(i['statistics'])
+                    elif i['player']['name'] in yellowreds:
+                        i['statistics']['yellowReds'] = 1
+                        item.append(i['statistics'])
+                    elif i['player']['name'] in reds:
+                        i['statistics']['reds'] = 1
+                        item.append(i['statistics'])
+                    else:
+                        item.append(i['statistics'])
+            return item
+        else:
+            return [[]]
 
     def get_gk_player_stats(match_id):
         item = []
+        yellows = []
+        yellowreds = []
+        reds = []
         event_lineups = check_website_and_assign(f"http://www.sofascore.com/api/v1/event/{match_id}/lineups")
+        event_incidents = check_website_and_assign(f"http://www.sofascore.com/api/v1/event/{match_id}/incidents")['incidents']
+        for i in event_incidents:
+            if i['incidentType'] == 'card':
+                if i['incidentClass'] == 'yellow':
+                    if 'player' in i:
+                        yellows.append(i['player']['name'])
+                elif i['incidentClass'] == 'yellowRed':
+                    if 'player' in i:
+                        yellowreds.append(i['player']['name'])
+                elif i['incidentClass'] == 'red':
+                    if 'player' in i:
+                        reds.append(i['player']['name'])
+
         home_lineups = event_lineups['home']['players']
         away_lineups = event_lineups['away']['players']
         for i in home_lineups:
             if 'statistics' in i and i['position'] == 'G':
-                item.append(i['statistics'])
+                if i['player']['name'] in yellows:
+                    i['statistics']['yellows'] = 1
+                    item.append(i['statistics'])
+                elif i['player']['name'] in yellowreds:
+                    i['statistics']['yellowReds'] = 1
+                    item.append(i['statistics'])
+                elif i['player']['name'] in reds:
+                    i['statistics']['reds'] = 1
+                    item.append(i['statistics'])
+                else:
+                    item.append(i['statistics'])
         for i in away_lineups:
             if 'statistics' in i and i['position'] == 'G':
-                item.append(i['statistics'])
+                if i['player']['name'] in yellows:
+                    i['statistics']['yellows'] = 1
+                    item.append(i['statistics'])
+                elif i['player']['name'] in yellowreds:
+                    i['statistics']['yellowReds'] = 1
+                    item.append(i['statistics'])
+                elif i['player']['name'] in reds:
+                    i['statistics']['reds'] = 1
+                    item.append(i['statistics'])
+                else:
+                    item.append(i['statistics'])
         return item
 
     def initialize_and_update(keys, data_dict):
