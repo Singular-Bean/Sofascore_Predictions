@@ -38,7 +38,7 @@ def create_training_or_testing_data():
             SEASON_ID = None
 
     OTHER_TOURNAMENT_ID = fetch_and_parse_json(
-        f"https://www.sofascore.com/api/v1/unique-tournament/{TOURNAMENT_ID}/season/{SEASON_ID}/events/round/1")[
+        f"http://www.sofascore.com/api/v1/unique-tournament/{TOURNAMENT_ID}/season/{SEASON_ID}/events/round/1")[
         "events"][0]["tournament"]["id"]
 
     TARGET_FILENAME = input("Enter the file path you would like to save the data to: ")
@@ -76,7 +76,7 @@ def create_training_or_testing_data():
     team_and_final_position = []
     for i in range(0, len(teamlistids)):
         link = fetch_and_parse_json(
-            f"https://www.sofascore.com/api/v1/tournament/{OTHER_TOURNAMENT_ID}/season/{SEASON_ID}/standings/total")[
+            f"http://www.sofascore.com/api/v1/tournament/{OTHER_TOURNAMENT_ID}/season/{SEASON_ID}/standings/total")[
             "standings"][0]["rows"][i]
         team_and_final_position.append((link["team"]["name"], link["position"]))
 
