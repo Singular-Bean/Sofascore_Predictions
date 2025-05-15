@@ -196,6 +196,9 @@ The stats provided in the 23/24 season are:
 - errors leading to a goal
 - own goals
 - total offsides
+- yellow cards
+- second yellows
+- red cards
 
 The program then saves this data to a json file of the user's choosing.
 
@@ -223,3 +226,65 @@ containing the training data. It then asks the user to manually input the data f
 would like to predict the rating for. This is something which is quite tedious because there are so
 many statistics to input, but I may automate this in the future. It then uses the model to
 predict the rating of the player and outputs the result.
+
+This is an example of it being used:
+```
+Which model would you like to use for your prediction?
+1. Random Forest
+2. OLS Regression
+3. KNN Regression
+4. Decision Tree
+5. Gradient Boosting
+6. XGBoost
+7. SVR (RBF Kernel)
+6
+What is your subject's totalPass statisitc? 17
+What is your subject's accuratePass statisitc? 14
+What is your subject's totalLongBalls statisitc? 0
+What is your subject's accurateLongBalls statisitc? 0
+What is your subject's aerialWon statisitc? 0
+What is your subject's duelLost statisitc? 2
+What is your subject's duelWon statisitc? 0
+What is your subject's totalClearance statisitc? 0
+What is your subject's totalTackle statisitc? 0
+What is your subject's fouls statisitc? 0
+What is your subject's minutesPlayed statisitc? 72
+What is your subject's touches statisitc? 27
+What is your subject's possessionLostCtrl statisitc? 5
+What is your subject's expectedGoals statisitc? 1.1174
+What is your subject's expectedAssists statisitc? 0.0674035
+What is your subject's aerialLost statisitc? 0
+What is your subject's challengeLost statisitc? 1
+What is your subject's dispossessed statisitc? 0
+What is your subject's outfielderBlock statisitc? 0
+What is your subject's interceptionWon statisitc? 0
+What is your subject's wasFouled statisitc? 0
+What is your subject's totalContest statisitc? 1
+What is your subject's keyPass statisitc? 1
+What is your subject's shotOffTarget statisitc? 0
+What is your subject's totalCross statisitc? 1
+What is your subject's accurateCross statisitc? 1
+What is your subject's wonContest statisitc? 0
+What is your subject's blockedScoringAttempt statisitc? 2
+What is your subject's onTargetScoringAttempt statisitc? 3
+What is your subject's reds statisitc? 0
+What is your subject's goalAssist statisitc? 0
+What is your subject's bigChanceCreated statisitc? 0
+What is your subject's goals statisitc? 3
+What is your subject's lastManTackle statisitc? 0
+What is your subject's errorLeadToAShot statisitc? 0
+What is your subject's totalOffside statisitc? 0
+What is your subject's bigChanceMissed statisitc? 0
+What is your subject's yellows statisitc? 0
+What is your subject's hitWoodwork statisitc? 0
+What is your subject's clearanceOffLine statisitc? 0
+What is your subject's penaltyConceded statisitc? 0
+What is your subject's penaltyWon statisitc? 0
+What is your subject's errorLeadToAGoal statisitc? 0
+What is your subject's yellowReds statisitc? 0
+What is your subject's penaltyMiss statisitc? 0
+What is your subject's ownGoals statisitc? 0
+Predicted rating: 9.23
+```
+This is from a game in 2023 where Heung-Min Son scored a hat-trick against Burnley. His actual 
+rating was 9.2
